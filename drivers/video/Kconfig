@@ -402,6 +402,14 @@ config VIDEO_LCD_ANX9804
 	from a parallel LCD interface and translate it on the fy into a DP
 	interface for driving eDP TFT displays. It uses I2C for configuration.
 
+config VIDEO_LCD_ILITEK_ILI9881C
+        bool "ILI9881C DSI LCD panel support"
+        depends on DM_VIDEO
+        select VIDEO_MIPI_DSI
+        default n
+        ---help---
+        Support for Powertip PH720128T003 panel with ILI9881C controller.
+
 config VIDEO_LCD_ORISETECH_OTM8009A
 	bool "OTM8009A DSI LCD panel support"
 	depends on DM_VIDEO
