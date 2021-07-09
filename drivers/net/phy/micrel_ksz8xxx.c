@@ -28,6 +28,11 @@ static struct phy_driver KSZ804_driver = {
 #define KSZPHY_OMSO_FACTORY_TEST BIT(15)
 #define KSZPHY_OMSO_B_CAST_OFF	(1 << 9)
 
+#define MII_KSZPHY_CTRL_1	0x1e
+#define MII_KSZPHY_CTRL_2	0x1f
+#define MII_KSZPHY_CTRL		MII_KSZPHY_CTRL_2
+#define KSZPHY_RMII_REF_CLK_SEL	BIT(7)
+
 static int ksz_genconfig_bcastoff(struct phy_device *phydev)
 {
 	int ret;
@@ -102,13 +107,24 @@ static int ksz8081_config(struct phy_device *phydev)
 	int ret;
 
 	ret = phy_read(phydev, MDIO_DEVAD_NONE, MII_KSZPHY_OMSO);
+
 	if (ret < 0)
 		return ret;
 
 	ret &= ~KSZPHY_OMSO_FACTORY_TEST;
+	ret = phy_write(phydev, MDIO_DEVAD_NONE, MII_KSZPHY_OMSO, ret);
 
-	ret = phy_write(phydev, MDIO_DEVAD_NONE, MII_KSZPHY_OMSO,
-			ret | KSZPHY_OMSO_B_CAST_OFF);
+	if (ret < 0)
+		return ret;
+
+	ret = phy_read(phydev, MDIO_DEVAD_NONE, MII_KSZPHY_CTRL);
+
+	if (ret < 0)
+		return ret;
+
+	ret |= KSZPHY_RMII_REF_CLK_SEL;
+	ret = phy_write(phydev, MDIO_DEVAD_NONE, MII_KSZPHY_CTRL, ret);
+
 	if (ret < 0)
 		return ret;
 
